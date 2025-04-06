@@ -9,6 +9,11 @@ namespace JwtWebApiTutorial.Controllers;
 [Route("/api/v1/[controller]")]
 public class AuthController : ControllerBase
 {
+    private readonly IConfiguration _configuration;
+    public AuthController(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
     public static User user = new User();
     [HttpPost("register")]
     public async Task<IActionResult> Register(UserDto userDto)
@@ -55,9 +60,10 @@ public class AuthController : ControllerBase
     {
         List<Claim> claims = new List<Claim>()
         {
-            new Claim(ClaimTypes.Name,user.Username)
+            new Claim(ClaimTypes.Name,user.Username),
+            new Claim(ClaimTypes.Role,"Noob")
         };
-        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes("MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJ8fvG3mq3JXllgHxWvgZZDSc8Vz7Jsk\n+fjAFhgaWXu50YR6lvPdTyvQNMEwh0BjcfgDU5mbBY0CBIyMzi+3FO8CAwEAAQ=="));
+        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration["Jwt:SecurityKey"]));
         
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
